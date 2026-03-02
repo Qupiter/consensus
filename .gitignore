@@ -31,3 +31,22 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+
+# Spring Boot
+spring-boot-devtools.properties
+
+# IntelliJ
+.idea/
+out/
+
+# Eclipse
+*.classpath
+*.project
+*.settings/
