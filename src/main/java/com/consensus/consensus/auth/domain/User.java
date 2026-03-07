@@ -10,7 +10,10 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    private boolean emailVerified;
 
     private String passwordHash;
 
@@ -18,13 +21,22 @@ public class User {
 
     protected User() {}
 
-    public User(String username, String passwordHash) {
-        this.username = username;
+    public User(String email, String passwordHash) {
+        this.email = email;
+        this.emailVerified = false;
         this.passwordHash = passwordHash;
         this.createdAt = LocalDateTime.now();
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public boolean passwordMatches(String rawPassword, PasswordHasher hasher) {
         return hasher.verify(rawPassword, passwordHash);
+    }
+
+    public void markEmailVerified() {
+        this.emailVerified = true;
     }
 }

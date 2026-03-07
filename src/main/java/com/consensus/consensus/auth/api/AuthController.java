@@ -19,11 +19,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody @Valid AuthRequest req) {
-        return ResponseEntity.ok(service.register(req.username(), req.password()));
+        return ResponseEntity.ok(service.register(req.email(), req.password()));
     }
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody @Valid AuthRequest req) {
-        return ResponseEntity.ok(service.login(req.username(), req.password()));
+        return ResponseEntity.ok(service.login(req.email(), req.password()));
     }
 }

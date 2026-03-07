@@ -18,21 +18,25 @@ public class AuthService {
         this.hasher = hasher;
     }
 
-    public User register(String username, String password) {
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Username already taken");
+    public User register(String email, String password) {
+
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email already registered");
         }
-        User user = new User(username, hasher.hash(password));
+
+        User user = new User(email, hasher.hash(password));
         return userRepository.save(user);
     }
 
-    public User login(String username, String password) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public User login(String email, String password) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         if (!user.passwordMatches(password, hasher)) {
-            throw new RuntimeException("Invalid password");
+            throw new RuntimeException("Invalid credentials");
         }
+
         return user;
     }
 }
