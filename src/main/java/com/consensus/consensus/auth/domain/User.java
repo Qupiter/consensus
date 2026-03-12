@@ -1,19 +1,19 @@
 package com.consensus.consensus.auth.domain;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import com.consensus.consensus.auth.infrastructure.jpa.UserJpaEntity;
+import lombok.Getter;
 
-@Entity
-@Table(name = "users")
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Getter
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
-    @Column(unique = true, nullable = false)
     private String email;
 
-    private boolean emailVerified;
+    private boolean verified;
 
     private String passwordHash;
 
@@ -22,21 +22,37 @@ public class User {
     protected User() {}
 
     public User(String email, String passwordHash) {
+        this.id = UUID.randomUUID();
         this.email = email;
-        this.emailVerified = false;
+        this.verified = false;
         this.passwordHash = passwordHash;
         this.createdAt = LocalDateTime.now();
     }
 
-    public String getEmail() {
-        return email;
+    public static User reconstruct(UserJpaEntity jpa) {
+        User user = new User();
+        user.id = jpa.getId();
+        user.email = jpa.getEmail();
+        user.passwordHash = jpa.getPasswordHash();
+        user.verified = jpa.isVerified();
+        user.createdAt = jpa.getCreatedAt();
+        return user;
     }
 
-    public boolean passwordMatches(String rawPassword, PasswordHasher hasher) {
-        return hasher.verify(rawPassword, passwordHash);
+    public UserJpaEntity toJpa() {
+        UserJpaEntity entity = new UserJpaEntity();
+        entity.setEmail(this.email);
+        entity.setPasswordHash(this.passwordHash);
+        entity.setVerified(this.verified);
+        entity.setCreatedAt(this.createdAt);
+        return entity;
     }
 
-    public void markEmailVerified() {
-        this.emailVerified = true;
+    public boolean passwordMatches(String rawPassword, org.springframework.security.crypto.password.PasswordEncoder encoder) {
+        return encoder.matches(rawPassword, passwordHash);
+    }
+
+    public void verifyEmail() {
+        this.verified = true;
     }
 }

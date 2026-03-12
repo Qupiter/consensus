@@ -1,29 +1,47 @@
 package com.consensus.consensus.auth.api;
 
-import com.consensus.consensus.auth.application.AuthService;
-import com.consensus.consensus.auth.domain.User;
-import com.consensus.consensus.auth.dto.AuthRequest;
+import com.consensus.consensus.auth.application.LoginUserService;
+import com.consensus.consensus.auth.application.RefreshTokenService;
+import com.consensus.consensus.auth.application.RegisterUserService;
+import com.consensus.consensus.auth.dto.AuthResponse;
+import com.consensus.consensus.auth.dto.LoginRequest;
+import com.consensus.consensus.auth.dto.RefreshRequest;
+import com.consensus.consensus.auth.dto.RegisterRequest;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthService service;
+    private final RegisterUserService registerUserService;
+    private final LoginUserService loginUserService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthController(AuthService service) {
-        this.service = service;
+    public AuthController(
+            RegisterUserService registerUserService,
+            LoginUserService loginUserService,
+            RefreshTokenService refreshTokenService
+    ) {
+        this.registerUserService = registerUserService;
+        this.loginUserService = loginUserService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid AuthRequest req) {
-        return ResponseEntity.ok(service.register(req.email(), req.password()));
+    @ResponseStatus(HttpStatus.CREATED)
+    public void register(@RequestBody @Valid RegisterRequest request) {
+        registerUserService.register(request.email(), request.password());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody @Valid AuthRequest req) {
-        return ResponseEntity.ok(service.login(req.email(), req.password()));
+    public AuthResponse login(@RequestBody @Valid LoginRequest request) {
+        return loginUserService.login(request.email(), request.password());
+    }
+
+    @PostMapping("/refresh")
+    public AuthResponse refresh(@RequestBody @Valid RefreshRequest request) {
+        return refreshTokenService.refresh(request.refreshToken());
     }
 }
