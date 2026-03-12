@@ -14,7 +14,7 @@ It follows **Domain-Driven Design (DDD)** principles and a **component-driven ar
 
 ## ⚙️ Tech Stack
 
-- Java 21
+- Java 25
 - Spring Boot
 - PostgreSQL (via JPA/Hibernate)
 - Maven
